@@ -1,14 +1,12 @@
 package com.dridco.mongo
 
 import play.api.libs.json.{ Json, JsObject, Format }
-import play.api.libs.json.Json.JsValueWrapper
 import play.api.Play.current
 import play.modules.reactivemongo.ReactiveMongoPlugin
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api.collections.GenericCollection
 import reactivemongo.core.commands.LastError
 import scala.concurrent.Future
-import scala.util.{ Success, Failure }
 
 trait MongoRepository {
 
