@@ -1,11 +1,11 @@
 package com.dridco.mongo
 
-import play.api.libs.json.{ Json, JsObject, Format }
 import play.api.Play.current
+import play.api.libs.json.{Format, JsObject}
 import play.modules.reactivemongo.ReactiveMongoPlugin
 import play.modules.reactivemongo.json.collection.JSONCollection
-import reactivemongo.api.collections.GenericCollection
 import reactivemongo.core.commands.LastError
+
 import scala.concurrent.Future
 
 trait MongoRepository {
@@ -25,19 +25,11 @@ trait ObjectRepository[T] {
     collection.insert[T](o)
   }
 
-  def saveOrUpdate(query: Option[JsObject], modifier: Option[JsObject], o: T)(implicit format: Format[T]): Future[Any] = {
-    val result = for {
-      found <- findOneByQuery(query)
-    } yield saveOrUpdate(found, query, modifier, o)
-
-    result.recover {
-      case e: Exception => throw new RuntimeException("Save or update with query: " + query)
+  def saveOrUpdate(query: Option[JsObject], modifier: JsObject, o: T)(implicit format: Format[T]): Future[Any] = {
+    findOneByQuery(query).map {
+      case Some(found) => updateField(query, modifier)
+      case None => add(o)
     }
-  }
-
-  private def saveOrUpdate(found: Option[T], query: Option[JsObject], modifier: Option[JsObject], o: T)(implicit format: Format[T]): Future[Any] = found match {
-    case Some(obj) => updateField(query.getOrElse(throw new RuntimeException("Mandatory Query")), modifier.get)
-    case None => add(o)
   }
 
   def find()(implicit format: Format[T]): Future[List[T]] = {
@@ -60,12 +52,14 @@ trait ObjectRepository[T] {
 
   private def emptyQuery = JsObject(List())
 
-  def updateField(query: JsObject, modifier: JsObject)(implicit format: Format[T]): Future[Boolean] = {
-    collection.update(query, modifier).map(le => le.updated > 0)
+  def updateField(filter: Option[JsObject], modifier: JsObject)(implicit format: Format[T]): Future[Boolean] = filter match {
+    case Some(query) => collection.update(query, modifier).map(le => le.updated > 0)
+    case None => Future(false)
   }
 
-  def remove(query: JsObject)(implicit format: Format[T]): Future[Boolean] = {
-    collection.remove(query).map(le => le.updated > 0)
+  def remove(filter: Option[JsObject])(implicit format: Format[T]): Future[Boolean] = filter match {
+    case Some(query) => collection.remove(query).map(le => le.updated > 0)
+    case None => Future(false)
   }
 
 }
