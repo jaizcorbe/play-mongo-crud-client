@@ -2,7 +2,7 @@ package com.dridco.mongo
 
 import play.api.libs.json.Json
 
-object SampleDto {
+object SampleModel {
 
   case class UserDto(userId: Double, name: String)
 

@@ -1,6 +1,6 @@
 package com.dridco.mongo
 
-import SampleDto._
+import SampleModel._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import reactivemongo.api.indexes.{ Index, IndexType }
 import reactivemongo.bson._
