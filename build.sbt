@@ -15,6 +15,8 @@ libraryDependencies ++= Seq(
   "org.scalatestplus" 	%% 	"play" 			% 	"1.2.0" % "test"
 )
 
+credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
+
 publishTo <<= version { (v: String) =>
   val nexus = "https://oss.sonatype.org/"
   if (v.trim.endsWith("SNAPSHOT"))
