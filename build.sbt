@@ -1,6 +1,6 @@
 import sbt._
 
-organization := "com.dridco"
+organization := "com.gvolpe"
 
 name := """play-mongo-crud-client"""
 
